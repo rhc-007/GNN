@@ -1,0 +1,52 @@
+\=== GCN Experiments on Cora: Interpretation ===
+
+**1. Baseline GCN**
+
+* Test Accuracy: 0.7798 ± 0.0127
+* Observations: Standard 2-layer GCN gives a reasonable starting point. Seed variance is low, showing stable training.
+
+**2. Regularization (Dropout, Weight Decay, Label Smoothing)**
+
+* Best Test Accuracy: 0.8210 ± 0.0073
+* Observation: Adding dropout, weight decay, and label smoothing improved performance by \~4% over baseline.
+* Dropout 0.9 with weight decay 0.005 and label smoothing 0.1 performed best.
+* Regularization stabilizes training (lower std) and consistently improves test accuracy.
+
+**3. Weighted Edges (Uniform vs Cosine Similarity)**
+
+* Best Test Accuracy: 0.8210 ± 0.0073 (using uniform edge weights)
+* Cosine similarity edge weights consistently underperformed (\~0.75–0.77 test acc).
+* Observation: For Cora, simple uniform weighting works better; similarity-based edge weighting may not always help, possibly due to noisy feature correlations.
+
+**4. Label Corruption (Robustness Test)**
+
+* Observations:
+
+  * Noise-free (0.0 noise rate) runs match top regularized/weighted configurations (\~0.82).
+  * Increasing noise (0.1–0.3) steadily decreases test accuracy:
+
+    * Noise 0.1: \~0.80–0.81
+    * Noise 0.2: \~0.77–0.79
+    * Noise 0.3: \~0.71–0.74
+* Interpretation: GCNs are sensitive to label noise; even 10–20% label corruption causes noticeable performance drop.
+* Best configurations without noise do not provide robustness under high noise.
+
+**5. Key Takeaways**
+
+* Regularization improves baseline performance and stability.
+* Uniform edge weighting is preferable to similarity-based weighting on Cora.
+* Label noise significantly reduces accuracy; GCNs are not inherently robust to corrupted labels.
+* Future work: Explore noise-robust training methods (e.g., robust loss functions, label smoothing tuned for noise, semi-supervised methods, or noise-aware GNN variants) to improve performance under label corruption.
+
+**Summary Table (Top Results)**
+
+| Setting                 | Test Accuracy | Std Dev       |
+| ----------------------- | ------------- | ------------- |
+| Baseline                | 0.7798        | 0.0127        |
+| Best Regularized        | 0.8210        | 0.0073        |
+| Best Weighted (Uniform) | 0.8210        | 0.0073        |
+| Label Noise 0.1         | \~0.8147      | 0.0024–0.0023 |
+| Label Noise 0.2         | \~0.7843      | 0.0019–0.0042 |
+| Label Noise 0.3         | \~0.7297      | 0.0069–0.0184 |
+
+**Conclusion**: Regularization and uniform edge weighting improve accuracy and stability. Label corruption is a key vulnerability. Robust GCN training under noisy labels is the next logical step.
